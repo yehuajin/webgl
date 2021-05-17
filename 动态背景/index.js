@@ -112,12 +112,11 @@ function setPoints(data, num) {
 
 // 创建点
 function createPoints(gap) {
-  // 波动最大幅度 10px;
-  var max = 10;
+  // 波动最大幅度 20px;
+  var max = 20;
   var n = 100;
   var m = 10;
   var arr = [];
-  // var size = [];
   // 角度转弧度, 360度等于2πr
   var numToDeg = function (num) {
     return (Math.PI * num) / 180;
@@ -129,25 +128,25 @@ function createPoints(gap) {
       var y = webglY(
         -(height / 2) + Math.sin(numToDeg(deg)) * (max + j * 3) + j * 20
       );
-      var z = -1;
+      var z = 1;
       var item = [x, y, z];
       arr = arr.concat(item);
-      // size.push(4 - j / 4);
     }
   }
   return {
     positions: new Float32Array(arr),
-    // size: new Float32Array(size),
     nums: m * n,
   };
 }
 function render() {
+  // if (num > -100) {
   requestAnimationFrame(render);
   num = num - 1;
   var data = createPoints(num);
   console.log(data);
   // setSize(data.size, data.nums);
   setPoints(data.positions, data.nums);
+  // }
 }
 function webglX(num) {
   return num / (width / 2);
