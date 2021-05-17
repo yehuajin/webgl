@@ -4,9 +4,6 @@ var gl = canvas.getContext('webgl');
 var width = canvas.width;
 var height = canvas.height;
 var num = 1; // 深度
-var glProgram;
-gl.clearColor(0.5, 0.5, 0.5, 1.0);
-gl.clear(gl.COLOR_BUFFER_BIT);
 
 initWebGl();
 
@@ -37,7 +34,7 @@ function initWebGl() {
   }
   `;
   // 创建着色器程序
-  glProgram = gl.createProgram();
+  var glProgram = gl.createProgram();
   // 创建顶点着色器
   var vertexShader = gl.createShader(gl.VERTEX_SHADER);
   // 创建片元着色器
@@ -93,17 +90,21 @@ function setPoints(data, num) {
   // 3、向缓冲区写入数据
   gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW);
   // 4、获取attribute变量的存储位置，返回对应的地址信息
-  var aPosition = gl.getAttribLocation(glProgram, 'a_Position');
+  var aPosition = gl.getAttribLocation(gl.glProgram, 'a_Position');
   // 5、把缓冲区对象分配给a_Position
   // gl.vertexAttribPointer(aPosition, 2, gl.FLOAT, false, FSIZE*6, 0)
-  gl.vertexAttribPointer(aPosition, 2, gl.FLOAT, false, 0, 0);
+  gl.vertexAttribPointer(aPosition, 3, gl.FLOAT, false, 0, 0);
   // 6、链接缓冲区对象和aPosition
   gl.enableVertexAttribArray(aPosition);
 
-  var aPointSize = gl.getAttribLocation(glProgram, 'a_PointSize');
+  var aPointSize = gl.getAttribLocation(gl.glProgram, 'a_PointSize');
   gl.vertexAttrib1f(aPointSize, 3.0); // 大小
-  var aFragColor = gl.getUniformLocation(glProgram, 'a_FragColor');
+  var aFragColor = gl.getUniformLocation(gl.glProgram, 'a_FragColor');
   gl.uniform4f(aFragColor, 0.0, 0.5, 0.5, 1.0); // 颜色
+
+  // 清除屏幕
+  gl.clearColor(0.5, 0.5, 0.5, 1.0);
+  gl.clear(gl.COLOR_BUFFER_BIT);
 
   // 执行绘制工作
   gl.drawArrays(gl.POINTS, 0, num); // 0表示从第0个点开始，1表示绘制一个点
@@ -116,7 +117,7 @@ function createPoints(gap) {
   var n = 100;
   var m = 10;
   var arr = [];
-  var size = [];
+  // var size = [];
   // 角度转弧度, 360度等于2πr
   var numToDeg = function (num) {
     return (Math.PI * num) / 180;
@@ -131,12 +132,12 @@ function createPoints(gap) {
       var z = -1;
       var item = [x, y, z];
       arr = arr.concat(item);
-      size.push(4 - j / 4);
+      // size.push(4 - j / 4);
     }
   }
   return {
     positions: new Float32Array(arr),
-    size: new Float32Array(size),
+    // size: new Float32Array(size),
     nums: m * n,
   };
 }
@@ -145,7 +146,8 @@ function render() {
   num = num - 1;
   var data = createPoints(num);
   console.log(data);
-  // setPoints(data.positions, data.nums);
+  // setSize(data.size, data.nums);
+  setPoints(data.positions, data.nums);
 }
 function webglX(num) {
   return num / (width / 2);
