@@ -112,7 +112,7 @@
         // 4、获取attribute变量的存储位置，返回对应的地址信息
         var aPosition = gl.getAttribLocation(glProgram, 'a_Position');
         // 5、把缓冲区对象分配给a_Position
-        // gl.vertexAttribPointer(aPosition, 2, gl.FLOAT, false, FSIZE*6, 0)
+        // gl.vertexAttribPointer(aPosition, 2, gl.FLOAT, false, FSIZE*6, 0);第二个参数2表示一组数据是2个，即一个点有2个数据组成
         gl.vertexAttribPointer(aPosition, 2, gl.FLOAT, false, 0, 0);
         // 6、链接缓冲区对象和aPosition
         gl.enableVertexAttribArray(aPosition);
