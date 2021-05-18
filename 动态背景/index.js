@@ -100,10 +100,10 @@ function setPoints(data, num) {
   var aPointSize = gl.getAttribLocation(gl.glProgram, 'a_PointSize');
   gl.vertexAttrib1f(aPointSize, 3.0); // 大小
   var aFragColor = gl.getUniformLocation(gl.glProgram, 'a_FragColor');
-  gl.uniform4f(aFragColor, 0.0, 0.5, 0.5, 1.0); // 颜色
+  gl.uniform4f(aFragColor, 1.0, 0.0, 0.5, 1.0); // 颜色
 
   // 清除屏幕
-  gl.clearColor(0.5, 0.5, 0.5, 1.0);
+  gl.clearColor(0.0, 0.0, 0.0, 1.0);
   gl.clear(gl.COLOR_BUFFER_BIT);
 
   // 执行绘制工作
@@ -113,7 +113,7 @@ function setPoints(data, num) {
 // 创建点
 function createPoints(gap) {
   // 波动最大幅度 20px;
-  var max = 20;
+  var max = 10;
   var n = 100;
   var m = 10;
   var arr = [];
@@ -139,14 +139,12 @@ function createPoints(gap) {
   };
 }
 function render() {
-  // if (num > -100) {
   requestAnimationFrame(render);
   num = num - 1;
   var data = createPoints(num);
   console.log(data);
   // setSize(data.size, data.nums);
   setPoints(data.positions, data.nums);
-  // }
 }
 function webglX(num) {
   return num / (width / 2);
