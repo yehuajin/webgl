@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <img id="img" src="img/404.png" />
+    <canvas id="can" width="500" height="500"></canvas>
+    <script type="text/javascript">
+      var canvas = document.getElementById('can');
+      var ctx = canvas.getContext('2d');
+
+      // ctx.moveTo(100, 100);
+      // ctx.lineTo(300, 300);
+      // ctx.lineTo(100, 200);
+
+      // ctx.moveTo(200, 100);
+      // ctx.lineTo(400, 300);
+      // ctx.lineTo(200, 200);
+
+      // ctx.stroke();
+
+      // // 画一个圆
+      // ctx.fillStyle = '#000'; // 填充颜色，不填充就是空心圆
+      // //开始绘制
+      // ctx.beginPath();
+      // // ctx.arc(x,y,r,start, end, boolean),
+      // // x,y圆心
+      // // start起点(弧度)
+      // // end终点(弧度)
+      // // boolean 是否逆时针
+      // ctx.arc(200, 200, 100, 0 * Math.PI, 2 * Math.PI, false);
+      // // 绘制完成
+      // ctx.closePath();
+      // // 绘制
+      // ctx.stroke();
+
+      // // 绘制渐变
+      // var grd = ctx.createLinearGradient(0, 0, 500, 500); // 开始点0,0；结束点500,500
+      // grd.addColorStop(0, 'red'); // 第一个参数是颜色起始位置百分比，第二个是颜色值
+      // grd.addColorStop(0.5, 'blue');
+      // grd.addColorStop(1, 'yellow');
+
+      // ctx.fillStyle = grd; // 填充指定为渐变对象
+      // ctx.fillRect(0, 0, 500, 500); // 填充一个矩形
+
+      // ctx.font = '30px Arial'; // 定义字体
+      // // 实心字
+      // ctx.fillText('demo', 10, 50); // 写demo,起始位置是10， 50
+      // // 空心字
+      // ctx.strokeText('zixue', 10, 200);
+
+      // 在canvas中贴图
+      var img = document.getElementById('img');
+      img.onload = function () {
+        ctx.drawImage(img, 0, 0, 500, 500); // img贴的图片；0,0起始位置;500,500结束位置
+      };
+    </script>
+  </body>
+</html>
