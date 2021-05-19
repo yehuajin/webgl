@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script type="text/javascript" src="./utils.js"></script>
+  </head>
+  <body>
+    <canvas id="webgl" width="400" height="400"></canvas>
+    <script>
+      // 获取webgl
+      var canvas = document.getElementById('webgl');
+      var gl = canvas.getContext('webgl');
+
+      gl.clearColor(0.5, 0.5, 0.5, 1.0);
+      gl.clear(gl.COLOR_BUFFER_BIT);
+
+      // 1、初始化着色器,方式一
+      // var vs_source = document.getElementById('shader-vs').innerHTML;
+      // var fs_source = document.getElementById('shader-fs').innerHTML;
+
+      // 初始化着色器,方式二
+      var vs_source = `
+        attribute vec4 a_Position;
+        void main () {
+          gl_Position = a_Position;
+          gl_PointSize = 10.0;
+        }
+        `;
+      // gl_Position = vec4(-0.5, -0.5, 1.0, 1.0);
+      // gl_PointSize=80.0;
+      // 变成一个圆
+      var fs_source = `
+        #ifdef GL_ES
+          precision mediump float;
+        #endif
+        void main () {
+          float d = distance(gl_PointCoord, vec2(0.5, 0.5));
+          if (d<0.5) {
+            gl_FragColor=vec4(0.78,0.0,1.0,1.0);
+          } else {
+            discard;
+          }
+        }
+        `;
+      initShader(gl, vs_source, fs_source);
+      var data = new Float32Array([
+        0.5, 0.5,
+        -0.6, -0.5,
+        0.0, 0.9
+      ]);
+      bufferInit(gl, data, 'a_Position');
+      gl.drawArrays(gl.POINTS, 0, 3); // 0表示从第0个点开始，1表示绘制一个点
+    </script>
+  </body>
+</html>

@@ -97,7 +97,11 @@
         gl.linkProgram(glProgram);
         gl.useProgram(glProgram);
 
-        var p = new Float32Array([0.5, 0.5, -0.6, -0.5, 0.0, 0.9]);
+        var p = new Float32Array([
+          0.5, 0.5,
+          -0.6, -0.5,
+          0.0, 0.9
+        ]);
         // gl.vertexAttrib3fv(aPosition, p); // 位置
         // 1、创建缓冲区
         var vertexBuffer = gl.createBuffer();
