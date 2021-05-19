@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <script src="../utils.js"></script>
+</head>
+<body>
+  <canvas id="webgl" height="500" width="500"></canvas>
+  <script>
+    var canvas = document.getElementById('webgl');
+    var gl = canvas.getContext('webgl');
+    
+    var VERTEX_SHADER = `
+      attribute vec4 a_position;
+      attribute float a_size;
+      void main () {
+        gl_Position = a_position;
+        gl_PointSize = a_size;
+      }
+    `;
+
+    var FRAG_SHADER = `
+      void main () {
+        gl_FragColor=vec4(1.0, 0.0, 1.0, 1.0);
+      }
+    `;
+    gl.clearColor(1.0, 1.0, 0.5, 1.0);
+
+    initShader(gl, VERTEX_SHADER, FRAG_SHADER);
+
+    var bufferData = new Float32Array([
+      0.0, 0.0, 20.0,
+      0.5, 0.1, 30.0,
+      -0.5, -0.5, 10.0
+    ]);
+    // 每个元素的字节数
+    var FSIZE = bufferData.BYTES_PER_ELEMENT;
+   
+    var buffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+    gl.bufferData(gl.ARRAY_BUFFER, bufferData, gl.STATIC_DRAW);
+
+    var a_position = gl.getAttribLocation(gl.glProgram, 'a_position');
+    var a_size = gl.getAttribLocation(gl.glProgram, 'a_size');
+    // gl.vertexAttribPointer(index, size, type, normalized, stride, offset)
+    // stride:一组数据的字节长度，offset:该属性值在一组数据中偏移量
+    gl.vertexAttribPointer(a_position, 2, gl.FLOAT, false, FSIZE * 3, 0);
+    gl.vertexAttribPointer(a_size, 1, gl.FLOAT, false, FSIZE * 3, FSIZE * 2)
+
+    gl.enableVertexAttribArray(a_position);
+    gl.enableVertexAttribArray(a_size);
+    
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.drawArrays(gl.POINTS, 0, 3);
+    // gl.drawArrays(gl.TRIANGLES, 0, 3);
+
+  </script>
+</body>
+</html>

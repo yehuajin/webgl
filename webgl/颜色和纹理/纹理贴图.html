@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <script src="../utils.js"></script>
+</head>
+<body>
+  <canvas id="webgl" height="600" width="600"></canvas>
+  <script>
+    var canvas = document.getElementById('webgl');
+    var gl = canvas.getContext('webgl');
+    // a_position顶点坐标信息
+    // a_texCoord纹理坐标信息，2维，
+    // v_texCoord定义varying变量将纹理坐标传递给片元着色器
+    var VERTEX_SHADER = `
+      attribute vec4 a_position;
+      attribute vec2 a_texCoord;
+      varying vec2 v_texCoord;
+      void main () {
+        gl_Position = a_position;
+        v_texCoord=a_texCoord;
+      }
+    `;
+    // u_Sampler:接收纹理图像
+    // v_texCoord：接收纹理坐标
+    var FRAG_SHADER = `
+      precision lowp float;
+      uniform sampler2D u_Sampler;
+      uniform sampler2D u_Sampler2;
+      varying vec2 v_texCoord;
+      void main () {
+        vec4 color=texture2D(u_Sampler, v_texCoord);
+        vec4 color2=texture2D(u_Sampler2, v_texCoord);
+        gl_FragColor=color*color2;
+      }
+    `;
+    gl.clearColor(1.0, 1.0, 0.5, 1.0);
+
+    initShader(gl, VERTEX_SHADER, FRAG_SHADER);
+
+    var bufferData = new Float32Array([
+     -0.5, 0.5, 0.0, 1.0,
+     -0.5, -0.5, 0.0, 0.0,
+     0.5, 0.5, 1.0, 1.0,
+     0.5, -0.5, 1.0, 0.0
+    ]);
+    // 每个元素的字节数
+    var FSIZE = bufferData.BYTES_PER_ELEMENT;
+   
+    var buffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+    gl.bufferData(gl.ARRAY_BUFFER, bufferData, gl.STATIC_DRAW);
+
+    var a_position = gl.getAttribLocation(gl.glProgram, 'a_position');
+    var a_texCoord = gl.getAttribLocation(gl.glProgram, 'a_texCoord');
+    // gl.vertexAttribPointer(index, size, type, normalized, stride, offset)
+    // stride:一组数据的字节长度，offset:该属性值在一组数据中偏移量
+    gl.vertexAttribPointer(a_position, 2, gl.FLOAT, false, FSIZE * 4, 0);
+    gl.vertexAttribPointer(a_texCoord, 2, gl.FLOAT, false, FSIZE * 4, FSIZE * 2)
+
+    gl.enableVertexAttribArray(a_position);
+    gl.enableVertexAttribArray(a_texCoord);
+    initTexture();
+    //  1、创建纹理对象
+    function initTexture () {
+      var texture = gl.createTexture();
+      var texture2 = gl.createTexture();
+
+      var u_Sampler = gl.getUniformLocation(gl.glProgram, 'u_Sampler');
+      var u_Sampler2 = gl.getUniformLocation(gl.glProgram, 'u_Sampler2');
+
+      var image = new Image();
+      var image2 = new Image();
+      // 2.加载图片
+      image.onload = function () {
+        loadTexture(gl, texture, u_Sampler, image, 0)
+      }
+      image2.onload = function () {
+        loadTexture(gl, texture2, u_Sampler2, image2, 1)
+      }
+      image.crossOrigin = 'anonymous';
+      image2.crossOrigin = 'anonymous';
+      // image.src = './img/tk.jpg';
+      // image2.src = './img/xin.jpg';
+      image.src = 'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fdpic.tiankong.com%2Fpc%2Fb5%2FQJ8448137459.jpg&refer=http%3A%2F%2Fdpic.tiankong.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1624008766&t=cad46553ceb9c88e90adf912b56377f9';
+      image2.src = 'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fcdn.u2.huluxia.com%2Fg3%2FM00%2FE9%2F62%2FwKgBOVt_8YiAffxlAAG8W2wWnP489.jpeg&refer=http%3A%2F%2Fcdn.u2.huluxia.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1624008835&t=63e3207611bcc92721622580f8f15010';
+    }
+
+    var g_texUnit = false;
+    var g_texUnit2 = false;
+
+    //  加载纹理gl: 上下文,texture:纹理对象，u_Sampler：采样器位置，image， texUnit:纹理单元编号
+    function loadTexture (gl, texture, u_Sampler, image, texUnit) {
+      // 3、纹理图像y轴反转，图像的y轴和webgl上的y轴是相反方向的所以需要反转
+      gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 1);
+      if (texUnit === 0) {
+        gl.activeTexture(gl.TEXTURE0); // 4、激活第0个纹理
+        g_texUnit = true;
+      } else {
+        gl.activeTexture(gl.TEXTURE1); // 4、激活第1个纹理
+        g_texUnit2 = true;
+      }
+      // 5、绑定纹理对象
+      gl.bindTexture(gl.TEXTURE_2D, texture)
+      // 6、配置纹理参数
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+      // 7、将纹理图像分配给纹理对象
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, image) 
+      // 8、将纹理单元传递给片元着色器
+      gl.uniform1i(u_Sampler, texUnit);
+      if (g_texUnit && g_texUnit2) {
+        gl.clear(gl.COLOR_BUFFER_BIT);
+        gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+      }
+    }
+
+  </script>
+</body>
+</html>
