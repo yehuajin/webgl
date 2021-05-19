@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <script type="text/javascript" src="./matrix.js"></script>
+  <script type="text/javascript" src="../utils.js"></script>
+</head>
+<body>
+  <canvas id="webgl" width="500" height="500"></canvas>
+  <script type="text/javascript">
+    var canvas = document.getElementById('webgl');
+    var gl = canvas.getContext('webgl');
+
+    //  gl_Position = u_rotate * u_translate * a_position;
+    // 表示先平移再旋转， 靠近a_position的先执行
+    var VERTEX_SHADER = `
+      attribute vec4 a_position;
+      uniform mat4 u_translate;
+      uniform mat4 u_rotate;
+      void main () {
+        gl_Position = u_rotate * u_translate * a_position;
+      }
+    `;
+    var FRAG_SHADER = `
+      void main () {
+        gl_FragColor=vec4(1.0, 0.0, 0.0, 1.0);
+      }
+    `;
+    initShader(gl, VERTEX_SHADER, FRAG_SHADER);
+    var bufferData = new Float32Array([
+      0.0, 0.0,
+      0.3, 0.3,
+      0.6, 0.0
+    ]);
+    bufferInit(gl, bufferData, 'a_position');
+    var u_translate = gl.getUniformLocation(gl.glProgram, 'u_translate');
+    var u_rotate = gl.getUniformLocation(gl.glProgram, 'u_rotate');
+    gl.clearColor(0.0, 0.0, 0.0, 1.0);
+
+    var  x = 0.0;
+    var  y = 0.0;
+    var  z = 0.0;
+    var angle = 0.0;
+
+    function run (x, y, z, angle) {
+      gl.uniformMatrix4fv(u_translate, false, translate(x, y, z));
+      gl.uniformMatrix4fv(u_rotate, false, rotate(angle));
+      gl.clear((gl.COLOR_BUFFER_BIT));
+      gl.drawArrays(gl.TRIANGLES, 0, 3);
+    }
+
+    run(x, y, z, angle);
+
+  
+  </script>
+</body>
+</html>

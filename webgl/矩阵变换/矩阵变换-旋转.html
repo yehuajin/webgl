@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>矩阵变换</title>
+    <script type="text/javascript" src="./utils.js"></script>
+  </head>
+  <body>
+    <canvas id="webgl" width="500" height="500"></canvas>
+    <script>
+      // 获取webgl
+      var canvas = document.getElementById('webgl');
+      var gl = canvas.getContext('webgl');
+
+      gl.clearColor(0.0, 1.0, 1.0, 1.0);
+
+      // 初始化着色器
+      var vs_source = `
+        attribute vec4 a_Position;
+        uniform mat4 u_change;
+        void main () {
+          gl_Position = u_change * a_Position;
+        }
+        `;
+      // gl_Position = vec4(-0.5, -0.5, 1.0, 1.0);
+      // gl_PointSize=80.0;
+      var fs_source = `
+        void main () {
+          gl_FragColor=vec4(0.78,0.0,1.0,1.0);
+        }
+        `;
+      initShader(gl, vs_source, fs_source);
+      var data = new Float32Array([
+        0.0, 0.0,
+        -0.3, -0.3,
+        -0.3, 0.3
+      ]);
+      bufferInit(gl, data, 'a_Position');
+      var u_change = gl.getUniformLocation(gl.glProgram, 'u_change');
+      
+      var angle = 0.0;
+      
+      function run(angle) {
+        var sinB = Math.sin(Math.PI*angle/180.0);
+        var cosB = Math.cos(Math.PI*angle/180.0);
+
+        // 四行4列的矩阵
+        var dataMatrix = new Float32Array([
+          cosB, sinB, 0.0, 0.0,
+          -sinB, cosB, 0.0, 0.0,
+          0.0, 0.0, 1.0, 0.0,
+          0.0, 0.0, 0.0, 1.0,
+        ]);
+        gl.clear(gl.COLOR_BUFFER_BIT);
+        gl.uniformMatrix4fv(u_change, false, dataMatrix);
+        gl.drawArrays(gl.TRIANGLES, 0, 3); // 0表示从第0个点开始，1表示绘制一个点
+      }
+
+      run(angle);
+      window.onkeydown = function (e) {
+        // // 左键
+        // if (e.keyCode === 37) {
+        //   angle -= 1.0;
+        // }
+        // // 右键
+        // if (e.keyCode === 39) {
+        //   angle += 1.0;
+        // }
+        // 下建
+        if (e.keyCode === 40) {
+          angle -= 1.0;
+        }
+        // 上健
+        if (e.keyCode === 38) {
+          angle += 1.0;
+        }
+        run(angle);
+      };
+    </script>
+  </body>
+</html>
