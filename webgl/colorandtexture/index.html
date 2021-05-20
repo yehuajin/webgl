@@ -5,7 +5,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
-  <script src="../utils.js"></script>
+  <script src="/utils.js"></script>
 </head>
 <body>
   <canvas id="webgl" height="600" width="600"></canvas>
@@ -84,10 +84,8 @@
       image.crossOrigin = 'anonymous';
       image2.crossOrigin = 'anonymous';
       // chrome存在跨域问题必须开个服务
-      // image.src = './img/tk.jpg';
-      // image2.src = './img/xin.jpg';
-      image.src = 'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fdpic.tiankong.com%2Fpc%2Fb5%2FQJ8448137459.jpg&refer=http%3A%2F%2Fdpic.tiankong.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1624008766&t=cad46553ceb9c88e90adf912b56377f9';
-      image2.src = 'https://gimg2.baidu.com/image_search/src=http%3A%2F%2Fcdn.u2.huluxia.com%2Fg3%2FM00%2FE9%2F62%2FwKgBOVt_8YiAffxlAAG8W2wWnP489.jpeg&refer=http%3A%2F%2Fcdn.u2.huluxia.com&app=2002&size=f9999,10000&q=a80&n=0&g=0n&fmt=jpeg?sec=1624008835&t=63e3207611bcc92721622580f8f15010';
+      image.src = '/colorandtexture/img/tk.jpg';
+      image2.src = '/colorandtexture/img/xin.jpg';
     }
 
     var g_texUnit = false;
@@ -108,6 +106,8 @@
       gl.bindTexture(gl.TEXTURE_2D, texture)
       // 6、配置纹理参数
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
       // 7、将纹理图像分配给纹理对象
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, image) 
       // 8、将纹理单元传递给片元着色器
