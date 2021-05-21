@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script type="text/javascript" src="../utils.js"></script>
+    <script type="text/javascript" src="../lib/cuon-matrix.js"></script>
+  </head>
+  <body>
+    <canvas id="webgl" width="500" height="500"></canvas>
+    <script>
+      var canvas = document.getElementById('webgl');
+      var gl = canvas.getContext('webgl');
+
+      var VERTEX_SHADER = `
+        attribute vec4 a_pos;
+        attribute vec4 a_color;
+        varying vec4 v_color;
+        uniform mat4 u_viewMatrix;
+        void main () {
+          gl_Position = u_viewMatrix * a_pos;
+          v_color = a_color;
+        }
+      `;
+
+      var FRAG_SHADER = `
+        precision lowp float;
+        varying vec4 v_color;
+        void main () {
+          gl_FragColor=v_color;
+        }
+      `;
+
+      initShader(gl, VERTEX_SHADER, FRAG_SHADER);
+
+      var bufferData = new Float32Array([
+        0.0, 0.5, -0.4,   0.4, 1.0, 0.4,
+        -0.5, -0.5, -0.4,   0.4, 1.0, 0.4,
+        0.5, -0.5, -0.4,   0.4, 1.0, 0.4,
+
+        0.5, 0.4, -0.2,   1.0, 0.4, 0.4,
+        -0.5, 0.4, -0.2,   1.0, 0.4, 0.4,
+        0.0, -0.6, -0.2,   1.0, 0.4, 0.4,
+
+        0.0, 0.5, 0.0,   0.4, 0.4, 1.0,
+        -0.5, -0.5, 0.0,   0.4, 0.4, 1.0,
+        0.5, -0.5, 0.0,   0.4, 0.4, 1.0
+      ]);
+
+      var FSIZE = bufferData.BYTES_PER_ELEMENT;
+
+      var buffer = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+      gl.bufferData(gl.ARRAY_BUFFER, bufferData, gl.STATIC_DRAW);
+
+      var a_pos = gl.getAttribLocation(gl.glProgram, 'a_pos');
+      var a_color = gl.getAttribLocation(gl.glProgram, 'a_color');
+
+      gl.vertexAttribPointer(a_pos, 3, gl.FLOAT, false, FSIZE * 6, 0);
+      gl.vertexAttribPointer(a_color, 3, gl.FLOAT, false, FSIZE * 6, FSIZE * 3);
+
+      gl.enableVertexAttribArray(a_pos);
+      gl.enableVertexAttribArray(a_color);
+
+      var viewMatrix = new Matrix4();
+      var u_viewMatrix = gl.getUniformLocation(gl.glProgram, 'u_viewMatrix');
+
+      var x = 0.0;
+      var y = 0.0;
+      var z = 0.25;
+
+      function run (x, y, z) {
+        viewMatrix.setLookAt(x, y, z, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+        gl.uniformMatrix4fv(u_viewMatrix, false, viewMatrix.elements);
+        gl.drawArrays(gl.TRIANGLES, 0, 9);
+      }
+      run(x, y, z);
+      window.onkeydown = function (e) {
+        // 右键
+        if (e.keyCode === 39) {
+          x+=0.01;
+        }
+
+        // 左键
+        if (e.keyCode === 37) {
+          x-=0.01;
+        }
+
+         // 上键
+         if (e.keyCode === 38) {
+          y+=0.01;
+        }
+
+        // 下键
+        if (e.keyCode === 40) {
+          y-=0.01;
+        }
+        run(x, y, z);
+      }
+      
+    </script>
+  </body>
+</html>
