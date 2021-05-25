@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script type="text/javascript" src="../utils.js"></script>
+    <script type="text/javascript" src="../lib/cuon-matrix.js"></script>
+  </head>
+  <body>
+    <canvas id="webgl" width="500" height="500"></canvas>
+    <script>
+      var canvas = document.getElementById('webgl');
+      var gl = canvas.getContext('webgl');
+
+      var VERTEX_SHADER = `
+        attribute vec4 a_pos;
+        attribute vec4 a_color;
+        varying vec4 v_color;
+        uniform mat4 u_MVPMatrix;   // 复合矩阵
+        void main () {
+          gl_Position = u_MVPMatrix * a_pos;
+          v_color = a_color;
+        }
+      `;
+
+      var FRAG_SHADER = `
+        precision lowp float;
+        varying vec4 v_color;
+        void main () {
+          gl_FragColor=v_color;
+        }
+      `;
+
+      initShader(gl, VERTEX_SHADER, FRAG_SHADER);
+
+      var bufferData = new Float32Array([
+        0.0, 0.0, 1.0, 0.5, 0.5, 0.5,
+        1.0, 0.0, 1.0, 0.0, 1.0, 0.0,
+        0.0, 1.0, 1.0, 0.0, 0.0, 1.0,
+        1.0, 1.0, 1.0, 1.0, 0.0, 0.0,
+        0.0, 0.0, 0.0, 0.5, 0.0, 0.6,
+        1.0, 0.0, 0.0, 0.4, 0.5, 0.9,
+        0.0, 1.0, 0.0, 0.5, 0.3, 0.6,
+        1.0, 1.0, 0.0, 0.5, 0.3, 0.6,
+      ]);
+
+      var FSIZE = bufferData.BYTES_PER_ELEMENT;
+      
+      var index = new Uint8Array([
+        0,1,2,
+        1,2,3,
+        2,3,7,
+        2,7,6,
+        1,7,3,
+        1,5,7,
+        6,7,4,
+        7,5,4,
+        0,4,1,
+        1,4,5,
+        2,6,4,
+        0,2,4,
+      ]);
+
+      var buffer = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+      gl.bufferData(gl.ARRAY_BUFFER, bufferData, gl.STATIC_DRAW);
+
+      var a_pos = gl.getAttribLocation(gl.glProgram, 'a_pos');
+      var a_color = gl.getAttribLocation(gl.glProgram, 'a_color');
+
+      gl.vertexAttribPointer(a_pos, 3, gl.FLOAT, false, FSIZE * 6, 0);
+      gl.vertexAttribPointer(a_color, 3, gl.FLOAT, false, FSIZE * 6, FSIZE * 3);
+
+      gl.enableVertexAttribArray(a_pos);
+      gl.enableVertexAttribArray(a_color);
+
+      var indexBuffer = gl.createBuffer();
+      gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+      gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, index, gl.STATIC_DRAW);
+
+      var u_MVPMatrix = gl.getUniformLocation(gl.glProgram, 'u_MVPMatrix');
+      var MVP = new Matrix4();
+     
+
+      var near = 1.0;
+      var far = 100;
+
+      function run(near, far) {
+        MVP.setPerspective(30, 1, 1, 100)
+        MVP.lookAt(2,3,4,0,0,0,1,0,0,0);
+        gl.uniformMatrix4fv(u_MVPMatrix, false, MVP.elements);
+
+        gl.clearColor(0.0,0.0,0.0,1.0);
+        gl.enable(gl.DEPTH_TEST);
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+        gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_BYTE, 0);
+      }
+      run(near, far);
+    </script>
+  </body>
+</html>
